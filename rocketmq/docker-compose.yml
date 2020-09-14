@@ -1,0 +1,53 @@
+version: '3.5'
+services:
+  rmqnamesrv:
+    image: foxiswho/rocketmq:server
+    container_name: rmqnamesrv
+    restart: always
+    ports:
+      - 9876:9876
+    volumes:
+      - /data/rocketmq/server/logs:/opt/logs
+      - /data/rocketmq/server/store:/opt/store
+    networks:
+      phoenix-network:
+        ipv4_address: 172.32.1.10
+  rmqbroker:
+    image: foxiswho/rocketmq:broker
+    container_name: rmqbroker
+    restart: always
+    ports:
+      - 10909:10909
+      - 10911:10911
+    volumes:
+      - /data/rocketmq/broker-a/logs:/opt/logs
+      - /data/rocketmq/broker-a/store:/opt/store
+      - /data/rocketmq/broker-a/brokerconf/broker.conf:/etc/rocketmq/broker.conf
+    environment:
+      NAMESRV_ADDR: "rmqnamesrv:9876"
+      JAVA_OPTS: " -Duser.home=/opt"
+      JAVA_OPT_EXT: "-server -Xms256m -Xmx512m -Xmn512m"
+    command: mqbroker -c /etc/rocketmq/broker.conf
+    depends_on:
+      - rmqnamesrv
+    networks:
+      phoenix-network:
+        ipv4_address: 172.32.1.11
+
+  rmqconsole:
+    image: styletang/rocketmq-console-ng
+    container_name: rmqconsole
+    restart: always
+    ports:
+      - 10920:8080
+    environment:
+        JAVA_OPTS: "-Drocketmq.namesrv.addr=rmqnamesrv:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false"
+    depends_on:
+      - rmqnamesrv
+    networks:
+      phoenix-network:
+        ipv4_address: 172.32.1.12
+
+networks:
+  phoenix-network:
+    external: true
