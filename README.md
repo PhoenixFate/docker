@@ -17,4 +17,6 @@
 - solr
 - sqlserver
 - tomcat
-
+- elasticsearch
+- influxdb
+- cadvisor
