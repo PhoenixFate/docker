@@ -20,3 +20,4 @@
 - elasticsearch
 - influxdb
 - cadvisor
+- logstash
