@@ -1,0 +1,4 @@
+cp frps.service /usr/lib/systemd/system
+
+
+systemctl daemon-reload
